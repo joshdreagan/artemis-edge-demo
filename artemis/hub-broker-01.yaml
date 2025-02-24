@@ -1,0 +1,47 @@
+apiVersion: broker.amq.io/v1beta1
+kind: ActiveMQArtemis
+metadata:
+  name: hub-broker-01
+spec:
+  deploymentPlan:
+    size: 1
+    persistenceEnabled: true
+    journalType: nio
+    enableMetricsPlugin: true
+    storage:
+      size: 1Gi
+    resources:
+      limits:
+        cpu: "1000m"
+        memory: "2Gi"
+      requests:
+        cpu: "1000m"
+        memory: "2Gi"
+  acceptors:
+    - name: amqp-acceptor
+      protocols: amqp
+      port: 5672
+    - name: amqps-acceptor
+      protocols: amqp
+      port: 5671
+      sslEnabled: true
+      needClientAuth: false
+      expose: true
+    - name: mqtt-acceptor
+      protocols: mqtt
+      port: 1833
+    - name: mqtts-acceptor
+      protocols: mqtt
+      port: 8883
+      sslEnabled: true
+      needClientAuth: false
+      expose: true
+  env:
+    - name: JAVA_ARGS_APPEND
+      value: ""
+  console:
+    expose: true
+  brokerProperties:
+    - "globalMaxSize=1GiB"
+    - "clusterConfigurations.my-cluster.messageLoadBalancingType=OFF"
+    - "acceptorConfigurations.new-acceptor.params.sslAutoReload=true"

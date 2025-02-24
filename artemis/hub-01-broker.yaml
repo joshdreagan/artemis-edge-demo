@@ -1,7 +1,7 @@
 apiVersion: broker.amq.io/v1beta1
 kind: ActiveMQArtemis
 metadata:
-  name: hub-broker-01
+  name: hub-01-broker
 spec:
   deploymentPlan:
     size: 1
@@ -38,7 +38,7 @@ spec:
       expose: true
   env:
     - name: JAVA_ARGS_APPEND
-      value: ""
+      value: "-Dhawtio.realm=console -Dhawtio.keycloakEnabled=true -Dhawtio.keycloakClientConfig=${ARTEMIS_ETC_DIR}/keycloak-js-client.json -Dhawtio.authenticationEnabled=true"
   console:
     expose: true
   brokerProperties:

@@ -1,0 +1,5 @@
+{
+  "realm"    : "artemis-keycloak",
+  "clientId" : "artemis-console",
+  "url"      : "https://localhost:8443/auth"
+}

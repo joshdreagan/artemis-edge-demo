@@ -1,0 +1,17 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+Metadata:
+ name: hub-01-cert
+spec:
+ isCA: false
+ commonName: “amq.io”
+ dnsNames:
+   - “amq-broker-ss-0.amq-broker-svc-rte-default.cluster.local
+   - “amq-broker-ss-1.amq-broker-svc-rte-default.cluster.local
+ secretName: broker-cert-secret
+ subject:
+   organizations:
+   - “www.amq.io”
+ issuerRef:
+   name: root-ca-issuer
+   kind: ClusterIssuer

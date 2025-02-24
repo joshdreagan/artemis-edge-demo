@@ -1,0 +1,52 @@
+apiVersion: broker.amq.io/v1beta1
+kind: ActiveMQArtemis
+metadata:
+  name: spoke-01-broker
+spec:
+  deploymentPlan:
+    size: 1
+    persistenceEnabled: true
+    journalType: nio
+    enableMetricsPlugin: true
+    storage:
+      size: 500Mi
+    resources:
+      limits:
+        cpu: "1000m"
+        memory: "2Gi"
+      requests:
+        cpu: "1000m"
+        memory: "2Gi"
+  acceptors:
+    - name: amqp-acceptor
+      protocols: amqp
+      port: 5672
+    - name: mqtt-acceptor
+      protocols: mqtt
+      port: 1833
+  env:
+    - name: JAVA_ARGS_APPEND
+      value: ""
+  console:
+    expose: true
+  brokerProperties:
+    - "globalMaxSize=1GiB"
+    - "clusterConfigurations.my-cluster.messageLoadBalancingType=OFF"
+    - "acceptorConfigurations.new-acceptor.params.sslAutoReload=true"
+
+    - "connectorConfigurations.hub-01-federation-connector.params.host=${HUB01_HOST}"
+    - "connectorConfigurations.hub-01-federation-connector.params.port=${HUB01_PORT}"
+    - "connectorConfigurations.hub-01-federation-connector.params.sslEnabled=true"
+    - "connectorConfigurations.hub-01-federation-connector.params.trustStorePath=/etc/artemis-broker-tls-secret-volume/client.ts"
+    - "connectorConfigurations.hub-01-federation-connector.params.trustStorePassword=password"
+
+    - "federationConfigurations.hub-01.credentials.user=${HUB01_USER}"
+    - "federationConfigurations.hub-01.credentials.password=${HUB01_PASS}"
+    - "federationConfigurations.hub-01.upstreamConfigurations.hub-01.connectionConfiguration.staticConnectors=hub-01-federation-connector"
+    - "federationConfigurations.hub-01.upstreamConfigurations.hub-01.connectionConfiguration.retryInterval=500"
+    - "federationConfigurations.hub-01.upstreamConfigurations.hub-01.connectionConfiguration.retryIntervalMultiplier=2"
+    - "federationConfigurations.hub-01.upstreamConfigurations.hub-01.connectionConfiguration.maxRetryInterval=30000"
+    - "federationConfigurations.hub-01.upstreamConfigurations.hub-01.connectionConfiguration.circuitBreakerTimeout=30000"
+    - "federationConfigurations.hub-01.upstreamConfigurations.hub-01.policyRefs=app-qp"
+    - "federationConfigurations.hub-01.queuePolicies.app-qp.includeFederated=false"
+    - "federationConfigurations.hub-01.queuePolicies.app-qp.includes.all-app.queueMatch=app.#"

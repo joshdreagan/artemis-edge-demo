@@ -27,6 +27,7 @@ spec:
       protocols: amqp
       port: 5671
       sslEnabled: true
+      sslSecret: hub-01-broker-tls-secret
       needClientAuth: false
       expose: true
     - name: mqtt-acceptor
@@ -36,6 +37,7 @@ spec:
       protocols: mqtt
       port: 8883
       sslEnabled: true
+      sslSecret: hub-01-broker-tls-secret
       needClientAuth: false
       expose: true
   env:

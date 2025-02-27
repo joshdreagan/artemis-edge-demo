@@ -3,6 +3,8 @@ kind: ActiveMQArtemis
 metadata:
   name: hub-01-broker
 spec:
+  adminUser: "admin"
+  adminPassword: "admin"
   deploymentPlan:
     size: 1
     persistenceEnabled: true
@@ -38,9 +40,13 @@ spec:
       expose: true
   env:
     - name: JAVA_ARGS_APPEND
-      value: "-Dhawtio.realm=console -Dhawtio.keycloakEnabled=true -Dhawtio.keycloakClientConfig=${ARTEMIS_ETC_DIR}/keycloak-js-client.json -Dhawtio.authenticationEnabled=true"
+      value: "-Dhawtio.realm=console -Dhawtio.keycloakEnabled=true -Dhawtio.authenticationEnabled=true -Dhawtio.rolePrincipalClasses=org.apache.activemq.artemis.spi.core.security.jaas.RolePrincipal -Dhawtio.keycloakClientConfig=/amq/extra/secrets/oidc-jaas-config/_keycloak-js-client.json"
+  extraMounts:
+    secrets:
+      - "oidc-jaas-config"
   console:
     expose: true
+    requireLogin: true
   brokerProperties:
     - "globalMaxSize=1GiB"
     - "clusterConfigurations.my-cluster.messageLoadBalancingType=OFF"

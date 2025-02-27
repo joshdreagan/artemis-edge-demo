@@ -5,7 +5,5 @@
   "principal-attribute": "preferred_username",
   "use-resource-role-mappings": true,
   "ssl-required": "external",
-  "truststore": "${artemis.instance}/etc/broker.ts",
-  "truststore-password": "abcd1234",
   "confidential-port": 8443
 }

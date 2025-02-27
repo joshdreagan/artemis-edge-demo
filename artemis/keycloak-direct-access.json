@@ -2,11 +2,9 @@
   "realm": "artemis-keycloak",
   "resource": "artemis-broker",
   "auth-server-url": "https://localhost:8443/auth",
-  "use-resource-role-mappings": true,
   "principal-attribute": "preferred_username",
+  "use-resource-role-mappings": true,
   "ssl-required": "external",
-  "truststore": "${artemis.instance}/etc/broker.ts",
-  "truststore-password": "abcd1234",
   "credentials": {
     "secret": "cdd04e09-293d-4448-9c5d-a17600e6fefe"
   }

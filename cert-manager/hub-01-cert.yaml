@@ -1,17 +1,23 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 Metadata:
- name: hub-01-cert
+  name: hub-01-broker-cert
 spec:
- isCA: false
- commonName: “amq.io”
- dnsNames:
-   - “amq-broker-ss-0.amq-broker-svc-rte-default.cluster.local
-   - “amq-broker-ss-1.amq-broker-svc-rte-default.cluster.local
- secretName: broker-cert-secret
- subject:
-   organizations:
-   - “www.amq.io”
- issuerRef:
-   name: root-ca-issuer
-   kind: ClusterIssuer
+  isCA: false
+  commonName: “hub-01-broker-*-svc-rte-artemis.apps.cluster-d699q.d699q.sandbox535.opentlc.com”
+  dnsNames:
+    - “hub-01-broker-amqps-0-svc-rte-artemis.apps.cluster-d699q.d699q.sandbox535.opentlc.com"
+    - “hub-01-broker-mqtts-0-svc-rte-artemis.apps.cluster-d699q.d699q.sandbox535.opentlc.com"
+  secretName: hub-01-broker-cert-secret
+  subject:
+    organizations:
+      - “www.redhat.com”
+  issuerRef:
+    name: root-ca-issuer
+    kind: ClusterIssuer
+  keystores:
+    jks:
+      create: true
+      passwordSecretRef:
+        key: password
+        name: hub-01-broker-truststore-password

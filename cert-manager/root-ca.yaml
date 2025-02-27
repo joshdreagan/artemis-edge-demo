@@ -5,11 +5,11 @@ metadata:
   namespace: cert-manager
 spec:
   isCA: true
-  commonName: "amq.io.root"
+  commonName: "redhat.com"
   secretName: root-ca-secret
   subject:
     organizations:
-    - "www.amq.io"
+      - "www.redhat.com"
   issuerRef:
     name: root-issuer
     kind: ClusterIssuer

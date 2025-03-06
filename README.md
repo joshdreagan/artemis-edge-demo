@@ -19,23 +19,32 @@ Install the AMQ Broker operator into the 'artemis' namespace.
 oc -n keycloak apply -f ./keycloak/postgresql.yaml
 oc -n keycloak create secret generic keycloak-db-secret --from-literal=username=admin --from-literal=password=admin
 
-openssl req -subj '/CN=test.keycloak.org/O=Test Keycloak./C=US' -newkey rsa:2048 -nodes -keyout ./keycloak/tls/key.pem -x509 -days 365 -out ./keycloak/tls/certificate.pem
+openssl req -subj '/CN=keycloak-service/C=US' -addext 'subjectAltName = DNS:keycloak-service.svc,DNS:keycloak-service.svc.cluster.local,DNS:keycloak-service.keycloak.svc,DNS:keycloak-service.keycloak.svc.cluster.local,DNS:keycloak-ingress-keycloak.apps.cluster-5wjkd.5wjkd.sandbox1749.opentlc.com' -newkey rsa:2048 -nodes -keyout ./keycloak/tls/key.pem -x509 -days 365 -out ./keycloak/tls/certificate.pem
 oc -n keycloak create secret tls keycloak-tls-secret --cert ./keycloak/tls/certificate.pem --key ./keycloak/tls/key.pem
 
 oc -n keycloak apply -f ./keycloak/keycloak.yaml
+
+oc -n keycloak get secret keycloak-initial-admin -o jsonpath='{.data.username}' | base64 --decode
+oc -n keycloak get secret keycloak-initial-admin -o jsonpath='{.data.password}' | base64 --decode
+
+yq -p=json -oy '{"apiVersion": "k8s.keycloak.org/v2alpha1", "kind": "KeycloakRealmImport", "metadata": {"name": "artemis-keycloak"}, "spec": {"keycloakCRName": "keycloak", "realm": .}}' ./keycloak/realm-export.json | oc -n keycloak apply -f -
 ```
 
 ## Install/Configure AMQ Broker
 
 ```
-CN=${BROKER_NAME}-*-svc-rte-${NAMESPACE}.${DOMAIN}
+export NAMESPACE=artemis
+export DOMAIN=apps.cluster-5wjkd.5wjkd.sandbox1749.opentlc.com
+
+ADJ_BROKER_COUNT=0
+CN=hub-01-broker-*-svc-rte-${NAMESPACE}.${DOMAIN}
 SAN=
-SAN+=$(printf "DNS:${BROKER_NAME}-amqps-%s-svc-rte-${NAMESPACE}.${DOMAIN}," $(seq 0 ${ADJ_BROKER_COUNT}))
-SAN+=$(printf "DNS:${BROKER_NAME}-mqtts-%s-svc-rte-${NAMESPACE}.${DOMAIN}," $(seq 0 ${ADJ_BROKER_COUNT}))
+SAN+=$(printf "DNS:hub-01-broker-amqps-%s-svc-rte-${NAMESPACE}.${DOMAIN}," $(seq 0 ${ADJ_BROKER_COUNT}))
+SAN+=$(printf "DNS:hub-01-broker-mqtts-%s-svc-rte-${NAMESPACE}.${DOMAIN}," $(seq 0 ${ADJ_BROKER_COUNT}))
 keytool -genkeypair -alias broker -keyalg RSA -dname "CN=${CN}" -ext "SAN=${SAN}" -keystore "./artemis/tls/hub-01-broker-keystore.jks" -storepass "password"
 
-keytool -genkeypair -alias dummy -dname "CN=dummy" -keystore "./artemis/tls/hub-01-broker-truststore.jks" -storepass "password"
-keytool -delete -alias dummy -keystore "./artemis/tls/broker.ts" -storepass "password"
+keytool -genkeypair -alias dummy -keyalg RSA -dname "CN=dummy" -keystore "./artemis/tls/hub-01-broker-truststore.jks" -storepass "password"
+keytool -delete -alias dummy -keystore "./artemis/tls/hub-01-broker-truststore.jks" -storepass "password"
 
 oc -n artemis create secret generic hub-01-broker-tls-secret --from-file=broker.ks=./artemis/tls/hub-01-broker-keystore.jks --from-file=client.ts=./artemis/tls/hub-01-broker-truststore.jks --from-literal=keyStorePassword=password --from-literal=trustStorePassword=password
 
@@ -43,3 +52,7 @@ oc -n artemis create secret generic oidc-jaas-config --from-file=login.config=./
 
 oc -n artemis apply -f ./artemis/hub-01-broker.yaml
 ```
+
+./artemis producer --url=amqp://hub-01-broker-amqp-acceptor-0-svc.artemis.svc.cluster.local:5672 --protocol=AMQP --user=alice --password=bosco --message-count=1 --message='hello world' --destination=queue://app.test --verbose
+
+oc -n artemis run producer -ti --image=registry.redhat.io/amq7/amq-broker-rhel8:7.12.3 --rm=true --restart=Never -- /bin/bash

@@ -19,6 +19,9 @@ spec:
       requests:
         cpu: "1000m"
         memory: "2Gi"
+    extraMounts:
+      secrets:
+        - "oidc-jaas-config"
   acceptors:
     - name: amqp-acceptor
       protocols: amqp
@@ -42,14 +45,14 @@ spec:
       expose: true
   env:
     - name: JAVA_ARGS_APPEND
-      value: "-Dhawtio.realm=console -Dhawtio.keycloakEnabled=true -Dhawtio.authenticationEnabled=true -Dhawtio.rolePrincipalClasses=org.apache.activemq.artemis.spi.core.security.jaas.RolePrincipal -Dhawtio.keycloakClientConfig=/amq/extra/secrets/oidc-jaas-config/_keycloak-js-client.json"
-  extraMounts:
-    secrets:
-      - "oidc-jaas-config"
+#      value: "-Dhawtio.proxyWhitelist=*"
+      value: "-Dhawtio.realm=console -Dhawtio.keycloakEnabled=true -Dhawtio.authenticationEnabled=true -Dhawtio.keycloakClientConfig=/amq/extra/secrets/oidc-jaas-config/_keycloak-js-client.json"
   console:
     expose: true
     requireLogin: true
   brokerProperties:
     - "globalMaxSize=1GiB"
     - "clusterConfigurations.my-cluster.messageLoadBalancingType=OFF"
-    - "acceptorConfigurations.new-acceptor.params.sslAutoReload=true"
+#    - "acceptorConfigurations.new-acceptor.params.sslAutoReload=true"
+    - securityRoles.#.producer.send=true
+    - securityRoles.#.consumer.consume=true

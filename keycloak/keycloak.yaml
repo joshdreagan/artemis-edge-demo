@@ -16,4 +16,4 @@ spec:
   http:
     tlsSecret: keycloak-tls-secret
   hostname:
-    hostname: test.keycloak.org
+    hostname: keycloak-ingress-keycloak.apps.cluster-5wjkd.5wjkd.sandbox1749.opentlc.com

@@ -14,6 +14,11 @@ spec:
       name: keycloak-db-secret
       key: password
   http:
+    httpEnabled: true
     tlsSecret: keycloak-tls-secret
   hostname:
-    hostname: keycloak-ingress-keycloak.apps.cluster-5wjkd.5wjkd.sandbox1749.opentlc.com
+    hostname: keycloak-service-keycloak.apps.cluster-5wjkd.5wjkd.sandbox1749.opentlc.com
+    strict: false
+    strictBackchannel: false
+  ingress:
+    enabled: false

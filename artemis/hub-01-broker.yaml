@@ -43,10 +43,9 @@ spec:
       sslSecret: hub-01-broker-tls-secret
       needClientAuth: false
       expose: true
-  env:
-    - name: JAVA_ARGS_APPEND
-#      value: "-Dhawtio.proxyWhitelist=*"
-      value: "-Dhawtio.realm=console -Dhawtio.keycloakEnabled=true -Dhawtio.authenticationEnabled=true -Dhawtio.keycloakClientConfig=/amq/extra/secrets/oidc-jaas-config/_keycloak-js-client.json"
+#  env:
+#    - name: JAVA_ARGS_APPEND
+#      value: "-Dhawtio.realm=console -Dhawtio.keycloakEnabled=true -Dhawtio.authenticationEnabled=true -Dhawtio.keycloakClientConfig=/amq/extra/secrets/oidc-jaas-config/_keycloak-js-client.json"
   console:
     expose: true
     requireLogin: true

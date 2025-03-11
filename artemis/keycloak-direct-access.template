@@ -4,7 +4,9 @@
   "auth-server-url": "https://keycloak-ingress-keycloak.${KC_DOMAIN}/",
   "principal-attribute": "preferred_username",
   "use-resource-role-mappings": true,
-  "ssl-required": "none",
+  "ssl-required": "external",
+  "truststore": "${artemis.instance}/etc/broker.ts",
+  "truststore-password": "password",
   "confidential-port": 443,
   "credentials": {
     "secret": "HaDNIDfmkhFyd2i7jPIW5oLaCIZqys0Y"

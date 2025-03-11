@@ -117,9 +117,9 @@ oc -n artemis create secret generic hub-01-broker-tls-secret --from-file=broker.
 
 #
 # Create the OIDC JaaS configuration secret.
-cat "./artemis/keycloak-bearer-token.template" > "./artemis/keycloak-bearer-token.json"
-cat "./artemis/keycloak-direct-access.template" > "./artemis/keycloak-direct-access.json"
-cat "./artemis/keycloak-js-client.template" > "./artemis/keycloak-js-client.json"
+cat "./artemis/keycloak-bearer-token.template" | envsubst > "./artemis/keycloak-bearer-token.json"
+cat "./artemis/keycloak-direct-access.template" | envsubst > "./artemis/keycloak-direct-access.json"
+cat "./artemis/keycloak-js-client.template" | envsubst > "./artemis/keycloak-js-client.json"
 oc -n artemis create secret generic oidc-jaas-config --from-file=login.config=./artemis/login.config --from-file=_keycloak-js-client.json=./artemis/keycloak-js-client.json --from-file=_keycloak-direct-access.json=./artemis/keycloak-direct-access.json --from-file=_keycloak-bearker-token.json=./artemis/keycloak-bearer-token.json
 
 

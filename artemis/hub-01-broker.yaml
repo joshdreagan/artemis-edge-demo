@@ -45,13 +45,14 @@ spec:
       expose: true
 #  env:
 #    - name: JAVA_ARGS_APPEND
-#      value: "-Dhawtio.realm=console -Dhawtio.keycloakEnabled=true -Dhawtio.authenticationEnabled=true -Dhawtio.keycloakClientConfig=/amq/extra/secrets/oidc-jaas-config/_keycloak-js-client.json"
+#      value: "-Dhawtio.realm=console -Dhawtio.role=admin -Dhawtio.keycloakEnabled=true -Dhawtio.authenticationEnabled=true -Dhawtio.keycloakClientConfig=/amq/extra/secrets/oidc-jaas-config/_keycloak-js-client.json"
   console:
     expose: true
     requireLogin: true
   brokerProperties:
     - "globalMaxSize=1GiB"
     - "clusterConfigurations.my-cluster.messageLoadBalancingType=OFF"
-#    - "acceptorConfigurations.new-acceptor.params.sslAutoReload=true"
+    - "acceptorConfigurations.amqps-acceptor.params.sslAutoReload=true"
+    - "acceptorConfigurations.mqtts-acceptor.params.sslAutoReload=true"
     - securityRoles.#.producer.send=true
     - securityRoles.#.consumer.consume=true

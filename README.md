@@ -113,7 +113,7 @@ oc -n keycloak get secret keycloak-initial-admin -o jsonpath='{.data.password}' 
 ```
 #
 # Create the Artemis TLS secret.
-oc -n artemis create secret generic hub-01-broker-tls-secret --from-file=broker.ks=./artemis/tls/hub-01-broker-keystore.jks --from-file=client.ts=./artemis/tls/hub-01-broker-truststore.jks --from-literal=keyStorePassword=password --from-literal=trustStorePassword=password
+oc -n artemis create secret generic broker-tls-secret --from-file=broker.ks=./artemis/tls/hub-01-broker-keystore.jks --from-file=client.ts=./artemis/tls/hub-01-broker-truststore.jks --from-literal=keyStorePassword=password --from-literal=trustStorePassword=password
 
 #
 # Create the OIDC JaaS configuration secret.

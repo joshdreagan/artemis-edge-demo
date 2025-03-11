@@ -30,7 +30,7 @@ spec:
       protocols: amqp
       port: 5671
       sslEnabled: true
-      sslSecret: hub-01-broker-tls-secret
+      sslSecret: broker-tls-secret
       needClientAuth: false
       expose: true
     - name: mqtt-acceptor
@@ -40,7 +40,7 @@ spec:
       protocols: mqtt
       port: 8883
       sslEnabled: true
-      sslSecret: hub-01-broker-tls-secret
+      sslSecret: broker-tls-secret
       needClientAuth: false
       expose: true
 #  env:
@@ -52,7 +52,9 @@ spec:
   brokerProperties:
     - "globalMaxSize=1GiB"
     - "clusterConfigurations.my-cluster.messageLoadBalancingType=OFF"
+
     - "acceptorConfigurations.amqps-acceptor.params.sslAutoReload=true"
     - "acceptorConfigurations.mqtts-acceptor.params.sslAutoReload=true"
+
     - securityRoles.#.producer.send=true
     - securityRoles.#.consumer.consume=true

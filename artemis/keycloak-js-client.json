@@ -1,5 +1,0 @@
-{
-  "realm"    : "artemis-keycloak",
-  "clientId" : "artemis-console",
-  "url"      : "http://keycloak-service-keycloak.apps.cluster-5wjkd.5wjkd.sandbox1749.opentlc.com/"
-}

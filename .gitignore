@@ -327,8 +327,6 @@ $RECYCLE.BIN/
 
 artemis/bin/
 artemis/tls/
-artemis/keycloak-bearer-token.json
-artemis/keycloak-direct-access.json
-artemis/keycloak-js-client.json
+artemis/tmp/
 
 keycloak/tls/

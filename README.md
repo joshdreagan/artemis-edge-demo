@@ -22,6 +22,8 @@ export SPOKE01_DOMAIN="<insert_domain_here>"
 export SPOKE02_DOMAIN="<insert_domain_here>"
 export SPOKE03_DOMAIN="<insert_domain_here>"
 export KC_DOMAIN="<insert_domain_here>"
+
+export STATEFUL_SET_ORDINAL='${STATEFUL_SET_ORDINAL}'
 ```
 
 Generate the TLS certs and stores.
@@ -130,17 +132,20 @@ oc -n artemis create secret generic broker-tls-secret --from-file=broker.ks=./ar
 
 #
 # Create the OIDC JaaS configuration secret.
-cat "./artemis/keycloak-bearer-token.template" | envsubst > "./artemis/keycloak-bearer-token.json"
-cat "./artemis/keycloak-direct-access.template" | envsubst > "./artemis/keycloak-direct-access.json"
-cat "./artemis/keycloak-js-client.template" | envsubst > "./artemis/keycloak-js-client.json"
-oc -n artemis create secret generic oidc-jaas-config --from-file=login.config=./artemis/login.config --from-file=_keycloak-js-client.json=./artemis/keycloak-js-client.json --from-file=_keycloak-direct-access.json=./artemis/keycloak-direct-access.json --from-file=_keycloak-bearker-token.json=./artemis/keycloak-bearer-token.json
+cat "./artemis/keycloak-bearer-token.template.json" | envsubst > "./artemis/tmp/keycloak-bearer-token.json"
+cat "./artemis/keycloak-direct-access.template.json" | envsubst > "./artemis/tmp/keycloak-direct-access.json"
+cat "./artemis/keycloak-js-client.template.json" | envsubst > "./artemis/tmp/keycloak-js-client.json"
+oc -n artemis create secret generic oidc-jaas-config --from-file=login.config=./artemis/login.config --from-file=_keycloak-js-client.json=./artemis/tmp/keycloak-js-client.json --from-file=_keycloak-direct-access.json=./artemis/tmp/keycloak-direct-access.json --from-file=_keycloak-bearker-token.json=./artemis/tmp/keycloak-bearer-token.json
 
+#
+# Create the brokerProperties secret.
+cat ./artemis/hub-01-broker.template.properties | envsubst > "./artemis/tmp/hub-01-broker.properties"
+oc -n artemis create secret generic hub-01-broker-bp --from-file=broker.properties=./artemis/tmp/hub-01-broker.properties
 
 #
 # Create the Artemis broker cluster.
 oc -n artemis apply -f "./artemis/hub-01-broker.yaml"
 ```
-
 
 ## Additional Helpful Commands
 
@@ -151,7 +156,7 @@ oc -n artemis run producer -ti --image=registry.redhat.io/amq7/amq-broker-rhel8:
 
 #
 # In the Bash shell that comes back once the container starts, run the following command.
-/opt/amq/bin/artemis producer --url=amqp://hub-01-broker-amqp-acceptor-0-svc.artemis.svc.cluster.local:5672 --protocol=AMQP --user=alice --password=bosco --message-count=1 --message='hello world' --destination=topic://app.test --verbose
+/opt/amq/bin/artemis producer --url=amqp://hub-01-broker-amqp-acceptor-0-svc.artemis.svc.cluster.local:5672 --protocol=AMQP --user=alice --password=bosco --message-count=1 --message='hello world' --destination=topic://messages.ALL.5606 --verbose
 
 #
 # Run an AMQP consumer on OpenShift so you don't have to do TLS.
@@ -159,5 +164,5 @@ oc -n artemis run consumer -ti --image=registry.redhat.io/amq7/amq-broker-rhel8:
 
 #
 # In the Bash shell that comes back once the container starts, run the following command.
-/opt/amq/bin/artemis consumer --url=amqp://hub-01-broker-amqp-acceptor-0-svc.artemis.svc.cluster.local:5672 --protocol=AMQP --user=bob --password=bosco --destination=topic://app.test --verbose
+/opt/amq/bin/artemis consumer --url=amqp://hub-01-broker-amqp-acceptor-0-svc.artemis.svc.cluster.local:5672 --protocol=AMQP --user=bob --password=bosco --destination=topic://messages.ALL.5606 --verbose
 ```

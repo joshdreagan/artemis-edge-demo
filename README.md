@@ -22,8 +22,6 @@ export SPOKE01_DOMAIN="<insert_domain_here>"
 export SPOKE02_DOMAIN="<insert_domain_here>"
 export SPOKE03_DOMAIN="<insert_domain_here>"
 export KC_DOMAIN="<insert_domain_here>"
-
-export STATEFUL_SET_ORDINAL='${STATEFUL_SET_ORDINAL}'
 ```
 
 Generate the TLS certs and stores.
@@ -79,10 +77,44 @@ keytool -import -noprompt -alias "hub-01-broker" -keystore "./artemis/tls/spoke-
 keytool -import -noprompt -alias "hub-02-broker" -keystore "./artemis/tls/spoke-01-broker-truststore.jks" -storepass "password" -file "./artemis/tls/hub-02-broker-certificate.crt"
 
 #
+# Artemis Spoke02 broker
+CN=spoke-02-broker-*.${SPOKE01_DOMAIN}
+SAN=
+SAN+=DNS:spoke-02-broker-cores-acceptor-master.${SPOKE02_DOMAIN},"
+SAN+=DNS:spoke-02-broker-cores-acceptor-slave.${SPOKE02_DOMAIN},"
+SAN+=DNS:spoke-02-broker-amqps-acceptor-master.${SPOKE02_DOMAIN},"
+SAN+=DNS:spoke-02-broker-amqps-acceptor-slave.${SPOKE02_DOMAIN},"
+SAN+=DNS:spoke-02-broker-mqtts-acceptor-master.${SPOKE02_DOMAIN},"
+SAN+=DNS:spoke-02-broker-mqtts-acceptor-slave.${SPOKE02_DOMAIN},"
+keytool -genkeypair -alias broker -keyalg RSA -dname "CN=${CN}" -ext "SAN=${SAN}" -keystore "./artemis/tls/spoke-02-broker-keystore.jks" -storepass "password"
+keytool -export -alias "broker" -keystore "./artemis/tls/spoke-02-broker-keystore.jks" -storepass "password" -file "./artemis/tls/spoke-02-broker-certificate.crt"
+keytool -import -noprompt -alias "keycloak" -keystore "./artemis/tls/spoke-02-broker-truststore.jks" -storepass "password" -file "./keycloak/tls/certificate.pem"
+keytool -import -noprompt -alias "hub-01-broker" -keystore "./artemis/tls/spoke-02-broker-truststore.jks" -storepass "password" -file "./artemis/tls/hub-01-broker-certificate.crt"
+keytool -import -noprompt -alias "hub-02-broker" -keystore "./artemis/tls/spoke-02-broker-truststore.jks" -storepass "password" -file "./artemis/tls/hub-02-broker-certificate.crt"
+
+#
+# Artemis Spoke03 broker
+CN=spoke-03-broker-*.${SPOKE01_DOMAIN}
+SAN=
+SAN+=DNS:spoke-03-broker-cores-acceptor-master.${SPOKE03_DOMAIN},"
+SAN+=DNS:spoke-03-broker-cores-acceptor-slave.${SPOKE03_DOMAIN},"
+SAN+=DNS:spoke-03-broker-amqps-acceptor-master.${SPOKE03_DOMAIN},"
+SAN+=DNS:spoke-03-broker-amqps-acceptor-slave.${SPOKE03_DOMAIN},"
+SAN+=DNS:spoke-03-broker-mqtts-acceptor-master.${SPOKE03_DOMAIN},"
+SAN+=DNS:spoke-03-broker-mqtts-acceptor-slave.${SPOKE03_DOMAIN},"
+keytool -genkeypair -alias broker -keyalg RSA -dname "CN=${CN}" -ext "SAN=${SAN}" -keystore "./artemis/tls/spoke-03-broker-keystore.jks" -storepass "password"
+keytool -export -alias "broker" -keystore "./artemis/tls/spoke-03-broker-keystore.jks" -storepass "password" -file "./artemis/tls/spoke-03-broker-certificate.crt"
+keytool -import -noprompt -alias "keycloak" -keystore "./artemis/tls/spoke-03-broker-truststore.jks" -storepass "password" -file "./keycloak/tls/certificate.pem"
+keytool -import -noprompt -alias "hub-01-broker" -keystore "./artemis/tls/spoke-03-broker-truststore.jks" -storepass "password" -file "./artemis/tls/hub-01-broker-certificate.crt"
+keytool -import -noprompt -alias "hub-02-broker" -keystore "./artemis/tls/spoke-03-broker-truststore.jks" -storepass "password" -file "./artemis/tls/hub-02-broker-certificate.crt"
+
+#
 # Artemis client
 keytool -import -noprompt -alias "hub-01-broker" -keystore "./artemis/tls/client-truststore.jks" -storepass "password" -file "./artemis/tls/hub-01-broker-certificate.crt"
 keytool -import -noprompt -alias "hub-02-broker" -keystore "./artemis/tls/client-truststore.jks" -storepass "password" -file "./artemis/tls/hub-02-broker-certificate.crt"
 keytool -import -noprompt -alias "spoke-01-broker" -keystore "./artemis/tls/client-truststore.jks" -storepass "password" -file "./artemis/tls/spoke-01-broker-certificate.crt"
+keytool -import -noprompt -alias "spoke-02-broker" -keystore "./artemis/tls/client-truststore.jks" -storepass "password" -file "./artemis/tls/spoke-02-broker-certificate.crt"
+keytool -import -noprompt -alias "spoke-03-broker" -keystore "./artemis/tls/client-truststore.jks" -storepass "password" -file "./artemis/tls/spoke-03-broker-certificate.crt"
 ```
 
 ## Install/Configure Keycloak
@@ -124,6 +156,8 @@ In the Keycloak admin console, switch to the "artemis-keycloak" realm. Under Use
 In the Keycloak admin console, switch to the "artemis-keycloak" realm. Under Users, create a new user named "bob" with artemis-broker/consumer roles. Add a new credential password with a value of "bosco".
 
 ## Install/Configure AMQ Broker
+
+__Hub01 Broker__
 
 ```
 #

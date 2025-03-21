@@ -80,12 +80,7 @@ keytool -import -noprompt -alias "hub-02-broker" -keystore "./artemis/tls/spoke-
 # Artemis Spoke02 broker
 CN=spoke-02-broker-*.${SPOKE01_DOMAIN}
 SAN=
-SAN+=DNS:spoke-02-broker-cores-acceptor-master.${SPOKE02_DOMAIN},"
-SAN+=DNS:spoke-02-broker-cores-acceptor-slave.${SPOKE02_DOMAIN},"
-SAN+=DNS:spoke-02-broker-amqps-acceptor-master.${SPOKE02_DOMAIN},"
-SAN+=DNS:spoke-02-broker-amqps-acceptor-slave.${SPOKE02_DOMAIN},"
-SAN+=DNS:spoke-02-broker-mqtts-acceptor-master.${SPOKE02_DOMAIN},"
-SAN+=DNS:spoke-02-broker-mqtts-acceptor-slave.${SPOKE02_DOMAIN},"
+SAN+=DNS:spoke-02-broker.${SPOKE02_DOMAIN},"
 keytool -genkeypair -alias broker -keyalg RSA -dname "CN=${CN}" -ext "SAN=${SAN}" -keystore "./artemis/tls/spoke-02-broker-keystore.jks" -storepass "password"
 keytool -export -alias "broker" -keystore "./artemis/tls/spoke-02-broker-keystore.jks" -storepass "password" -file "./artemis/tls/spoke-02-broker-certificate.crt"
 keytool -import -noprompt -alias "keycloak" -keystore "./artemis/tls/spoke-02-broker-truststore.jks" -storepass "password" -file "./keycloak/tls/certificate.pem"
@@ -96,12 +91,7 @@ keytool -import -noprompt -alias "hub-02-broker" -keystore "./artemis/tls/spoke-
 # Artemis Spoke03 broker
 CN=spoke-03-broker-*.${SPOKE01_DOMAIN}
 SAN=
-SAN+=DNS:spoke-03-broker-cores-acceptor-master.${SPOKE03_DOMAIN},"
-SAN+=DNS:spoke-03-broker-cores-acceptor-slave.${SPOKE03_DOMAIN},"
-SAN+=DNS:spoke-03-broker-amqps-acceptor-master.${SPOKE03_DOMAIN},"
-SAN+=DNS:spoke-03-broker-amqps-acceptor-slave.${SPOKE03_DOMAIN},"
-SAN+=DNS:spoke-03-broker-mqtts-acceptor-master.${SPOKE03_DOMAIN},"
-SAN+=DNS:spoke-03-broker-mqtts-acceptor-slave.${SPOKE03_DOMAIN},"
+SAN+=DNS:spoke-03-broker.${SPOKE03_DOMAIN},"
 keytool -genkeypair -alias broker -keyalg RSA -dname "CN=${CN}" -ext "SAN=${SAN}" -keystore "./artemis/tls/spoke-03-broker-keystore.jks" -storepass "password"
 keytool -export -alias "broker" -keystore "./artemis/tls/spoke-03-broker-keystore.jks" -storepass "password" -file "./artemis/tls/spoke-03-broker-certificate.crt"
 keytool -import -noprompt -alias "keycloak" -keystore "./artemis/tls/spoke-03-broker-truststore.jks" -storepass "password" -file "./keycloak/tls/certificate.pem"
@@ -166,20 +156,171 @@ oc -n artemis create secret generic broker-tls-secret --from-file=broker.ks=./ar
 
 #
 # Create the OIDC JaaS configuration secret.
-cat "./artemis/keycloak-bearer-token.template.json" | envsubst > "./artemis/tmp/keycloak-bearer-token.json"
-cat "./artemis/keycloak-direct-access.template.json" | envsubst > "./artemis/tmp/keycloak-direct-access.json"
-cat "./artemis/keycloak-js-client.template.json" | envsubst > "./artemis/tmp/keycloak-js-client.json"
-oc -n artemis create secret generic oidc-jaas-config --from-file=login.config=./artemis/login.config --from-file=_keycloak-js-client.json=./artemis/tmp/keycloak-js-client.json --from-file=_keycloak-direct-access.json=./artemis/tmp/keycloak-direct-access.json --from-file=_keycloak-bearker-token.json=./artemis/tmp/keycloak-bearer-token.json
+export TRUSTSTORE_PATH=/etc/broker-tls-secret-volume/client.ts
+cat "./artemis/keycloak-bearer-token.template.json" | envsubst > "./artemis/tmp/hub-01/keycloak-bearer-token.json"
+cat "./artemis/keycloak-direct-access.template.json" | envsubst > "./artemis/tmp/hub-01/keycloak-direct-access.json"
+cat "./artemis/keycloak-js-client.template.json" | envsubst > "./artemis/tmp/hub-01/keycloak-js-client.json"
+oc -n artemis create secret generic oidc-jaas-config --from-file=login.config=./artemis/login.config --from-file=_keycloak-js-client.json=./artemis/tmp/hub-01/keycloak-js-client.json --from-file=_keycloak-direct-access.json=./artemis/tmp/hub-01/keycloak-direct-access.json --from-file=_keycloak-bearker-token.json=./artemis/tmp/hub-01/keycloak-bearer-token.json
 
 #
 # Create the brokerProperties secret.
-cat ./artemis/hub-01-broker.template.properties | envsubst > "./artemis/tmp/hub-01-broker.properties"
-oc -n artemis create secret generic hub-01-broker-bp --from-file=broker.properties=./artemis/tmp/hub-01-broker.properties
+cat ./artemis/hub-01-broker.template.properties | envsubst > "./artemis/tmp/hub-01/hub-01-broker.properties"
+oc -n artemis create secret generic hub-01-broker-bp --from-file=broker.properties=./artemis/tmp/hub-01/hub-01-broker.properties
 
 #
 # Create the Artemis broker cluster.
 oc -n artemis apply -f "./artemis/hub-01-broker.yaml"
 ```
+
+__Hub02 Broker__
+
+```
+#
+# Create the Artemis TLS secret.
+oc -n artemis create secret generic broker-tls-secret --from-file=broker.ks=./artemis/tls/hub-02-broker-keystore.jks --from-file=client.ts=./artemis/tls/hub-02-broker-truststore.jks --from-literal=keyStorePassword=password --from-literal=trustStorePassword=password
+
+#
+# Create the OIDC JaaS configuration secret.
+export TRUSTSTORE_PATH=/etc/broker-tls-secret-volume/client.ts
+cat "./artemis/keycloak-bearer-token.template.json" | envsubst > "./artemis/tmp/hub-02/keycloak-bearer-token.json"
+cat "./artemis/keycloak-direct-access.template.json" | envsubst > "./artemis/tmp/hub-02/keycloak-direct-access.json"
+cat "./artemis/keycloak-js-client.template.json" | envsubst > "./artemis/tmp/hub-02/keycloak-js-client.json"
+oc -n artemis create secret generic oidc-jaas-config --from-file=login.config=./artemis/login.config --from-file=_keycloak-js-client.json=./artemis/tmp/hub-02/keycloak-js-client.json --from-file=_keycloak-direct-access.json=./artemis/tmp/hub-02/keycloak-direct-access.json --from-file=_keycloak-bearker-token.json=./artemis/tmp/hub-02/keycloak-bearer-token.json
+
+#
+# Create the brokerProperties secret.
+cat ./artemis/hub-02-broker.template.properties | envsubst > "./artemis/tmp/hub-02/hub-02-broker.properties"
+oc -n artemis create secret generic hub-02-broker-bp --from-file=broker.properties=./artemis/tmp/hub-02/hub-02-broker.properties
+
+#
+# Create the Artemis broker cluster.
+oc -n artemis apply -f "./artemis/hub-02-broker.yaml"
+```
+
+__Spoke01 Broker__
+
+```
+#
+# Create the Artemis TLS secret.
+oc -n artemis create secret generic broker-tls-secret --from-file=broker.ks=./artemis/tls/spoke-01-broker-keystore.jks --from-file=client.ts=./artemis/tls/spoke-01-broker-truststore.jks --from-literal=keyStorePassword=password --from-literal=trustStorePassword=password
+
+#
+# Create the OIDC JaaS configuration secret.
+export TRUSTSTORE_PATH=/etc/broker-tls-secret-volume/client.ts
+cat "./artemis/keycloak-bearer-token.template.json" | envsubst > "./artemis/tmp/spoke-01/keycloak-bearer-token.json"
+cat "./artemis/keycloak-direct-access.template.json" | envsubst > "./artemis/tmp/spoke-01/keycloak-direct-access.json"
+cat "./artemis/keycloak-js-client.template.json" | envsubst > "./artemis/tmp/spoke-01/keycloak-js-client.json"
+oc -n artemis create secret generic oidc-jaas-config --from-file=login.config=./artemis/login.config --from-file=_keycloak-js-client.json=./artemis/tmp/spoke-01/keycloak-js-client.json --from-file=_keycloak-direct-access.json=./artemis/tmp/spoke-01/keycloak-direct-access.json --from-file=_keycloak-bearker-token.json=./artemis/tmp/spoke-01/keycloak-bearer-token.json
+
+#
+# Create the brokerProperties secret.
+cat ./artemis/spoke-01-broker.template.properties | envsubst > "./artemis/tmp/spoke-01/spoke-01-broker.properties"
+oc -n artemis create secret generic spoke-01-broker-bp --from-file=broker.properties=./artemis/tmp/spoke-01/spoke-01-broker.properties
+
+#
+# Create the Artemis broker cluster.
+oc -n artemis apply -f "./artemis/spoke-01-broker.yaml"
+```
+
+__Spoke02 Broker__
+
+Prepare the installation files. __Do this on a Linux machine so the commands work, or manually make the edits to the files on a Windows machine.__
+
+```
+export TRUSTSTORE_PATH='${artemis.instance}/broker/etc/spoke-02-broker-truststore.jks'
+
+cat "./artemis/keycloak-bearer-token.template.json" | envsubst > "./artemis/tmp/spoke-02/keycloak-bearer-token.json"
+cat "./artemis/keycloak-direct-access.template.json" | envsubst > "./artemis/tmp/spoke-02/keycloak-direct-access.json"
+cat "./artemis/keycloak-js-client.template.json" | envsubst > "./artemis/tmp/spoke-02/keycloak-js-client.json"
+cat "./artemis/spoke-02-broker.template.properties" | envsubst > "./artemis/tmp/spoke-02/spoke-02-broker.properties"
+```
+
+Copy or download the Artemis installation zip to the Windows machine.
+
+Unzip the Artemis installation zip to the desired directory.
+
+Create the Artemis broker instance.
+
+```
+set ADVERTISED_HOST=127.0.0.1
+set ARTEMIS_INSTALL="<installation_directory>"
+cd "%ARTEMIS_INSTALL%"
+.\bin\artemis.cmd create --name="spoke-02-broker" --user=admin --password=admin --role=admin --require-login --host=%ADVERTISED_HOST% --message-load-balancing=OFF --http-host=0.0.0.0 --no-hornetq-acceptor --no-stomp-acceptor .\broker
+```
+
+Copy the following files to the %ARTEMIS_INSTALL%\broker\etc directory:
+
+- artemis\tls\spoke-02-broker-keystore.jks
+- artemis\tls\spoke-02-broker-truststore.jks
+- artemis\login.config
+- artemis\tmp\spoke-02\keycloak-js-client.json
+- artemis\tmp\spoke-02\keycloak-direct-access.json
+- artemis\tmp\spoke-02\keycloak-bearer-token.json
+- artemis\tmp\spoke-02\spoke-02-broker.properties
+
+Edit the %ARTEMIS_INSTALL%\broker\etc\broker.xml file. For each acceptor, add the following SSL parameters to the acceptor URL (use ";" for the parameter separator):
+
+- `sslEnabled=true`
+- `keyStorePath=${artemis.instance}/etc/spoke-02-broker-keystore.jks`
+- `keyStorePassword=password`
+- `keyStoreType=PKCS12`
+- `keyStoreProvider=SUN`
+- `trustStorePath=${artemis.instance}/etc/spoke-02-broker-truststore.jks`
+- `trustStorePassword=password`
+- `trustStoreType=PKCS12`
+- `trustStoreProvider=SUN`
+- `wantClientAuth=false`
+- `needClientAuth=false`
+
+__Spoke03 Broker__
+
+Prepare the installation files. __Do this on a Linux machine so the commands work, or manually make the edits to the files on a Windows machine.__
+
+```
+export TRUSTSTORE_PATH='${artemis.instance}/broker/etc/spoke-03-broker-truststore.jks'
+
+cat "./artemis/keycloak-bearer-token.template.json" | envsubst > "./artemis/tmp/spoke-03/keycloak-bearer-token.json"
+cat "./artemis/keycloak-direct-access.template.json" | envsubst > "./artemis/tmp/spoke-03/keycloak-direct-access.json"
+cat "./artemis/keycloak-js-client.template.json" | envsubst > "./artemis/tmp/spoke-03/keycloak-js-client.json"
+cat "./artemis/spoke-03-broker.template.properties" | envsubst > "./artemis/tmp/spoke-03/spoke-03-broker.properties"
+```
+
+Copy or download the Artemis installation zip to the Windows machine.
+
+Unzip the Artemis installation zip to the desired directory.
+
+Create the Artemis broker instance.
+
+```
+set ADVERTISED_HOST=127.0.0.1
+set ARTEMIS_INSTALL="<installation_directory>"
+cd "%ARTEMIS_INSTALL%"
+.\bin\artemis.cmd create --name="spoke-03-broker" --user=admin --password=admin --role=admin --require-login --host=%ADVERTISED_HOST% --message-load-balancing=OFF --http-host=0.0.0.0 --no-hornetq-acceptor --no-stomp-acceptor .\broker
+```
+
+Copy the following files to the %ARTEMIS_INSTALL%\broker\etc directory:
+
+- artemis\tls\spoke-03-broker-keystore.jks
+- artemis\tls\spoke-03-broker-truststore.jks
+- artemis\login.config
+- artemis\tmp\spoke-03\keycloak-js-client.json
+- artemis\tmp\spoke-03\keycloak-direct-access.json
+- artemis\tmp\spoke-03\keycloak-bearer-token.json
+- artemis\tmp\spoke-03\spoke-03-broker.properties
+
+Edit the %ARTEMIS_INSTALL%\broker\etc\broker.xml file. For each acceptor, add the following SSL parameters to the acceptor URL (use ";" for the parameter separator):
+
+- `sslEnabled=true`
+- `keyStorePath=${artemis.instance}/etc/spoke-03-broker-keystore.jks`
+- `keyStorePassword=password`
+- `keyStoreType=PKCS12`
+- `keyStoreProvider=SUN`
+- `trustStorePath=${artemis.instance}/etc/spoke-03-broker-truststore.jks`
+- `trustStorePassword=password`
+- `trustStoreType=PKCS12`
+- `trustStoreProvider=SUN`
+- `wantClientAuth=false`
+- `needClientAuth=false`
 
 ## Additional Helpful Commands
 

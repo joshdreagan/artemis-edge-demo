@@ -7,11 +7,11 @@ spec:
   adminPassword: "admin"
   deploymentPlan:
     size: 1
-    persistenceEnabled: true
+    persistenceEnabled: false
     journalType: nio
     enableMetricsPlugin: true
-    storage:
-      size: 500Mi
+#    storage:
+#      size: 500Mi
     resources:
       limits:
         cpu: "1000m"

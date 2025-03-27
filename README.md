@@ -258,19 +258,24 @@ Copy the following files to the %ARTEMIS_INSTALL%\broker\etc directory:
 - artemis\tmp\spoke-02\keycloak-bearer-token.json
 - artemis\tmp\spoke-02\spoke-02-broker.properties
 
-Edit the %ARTEMIS_INSTALL%\broker\etc\broker.xml file. For each acceptor, add the following SSL parameters to the acceptor URL (use ";" for the parameter separator):
+Edit the %ARTEMIS_INSTALL%\broker\etc\broker.xml file. add the following XML snippet anywhere under the `<acceptors>` element:
 
-- `sslEnabled=true`
-- `keyStorePath=${artemis.instance}/etc/spoke-02-broker-keystore.jks`
-- `keyStorePassword=password`
-- `keyStoreType=PKCS12`
-- `keyStoreProvider=SUN`
-- `trustStorePath=${artemis.instance}/etc/spoke-02-broker-truststore.jks`
-- `trustStorePassword=password`
-- `trustStoreType=PKCS12`
-- `trustStoreProvider=SUN`
-- `wantClientAuth=false`
-- `needClientAuth=false`
+```
+<acceptor name="cores">tcp://0.0.0.0:61617?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=CORE;useEpoll=true;sslEnabled=true;keyStorePath=${artemis.instance}/etc/spoke-02-broker-keystore.jks;keyStorePassword=password;keyStoreType=PKCS12;keyStoreProvider=SUN;wantClientAuth=false;needClientAuth=false</acceptor>
+<acceptor name="amqps">tcp://0.0.0.0:5671?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=AMQP;useEpoll=true;amqpCredits=1000;amqpLowCredits=300;amqpMinLargeMessageSize=102400;amqpDuplicateDetection=true;sslEnabled=true;keyStorePath=${artemis.instance}/etc/spoke-02-broker-keystore.jks;keyStorePassword=password;keyStoreType=PKCS12;keyStoreProvider=SUN;wantClientAuth=false;needClientAuth=false</acceptor>
+<acceptor name="mqtts">tcp://0.0.0.0:8883?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=MQTT;useEpoll=true;sslEnabled=true;keyStorePath=${artemis.instance}/etc/spoke-02-broker-keystore.jks;keyStorePassword=password;keyStoreType=PKCS12;keyStoreProvider=SUN;wantClientAuth=false;needClientAuth=false</acceptor>
+```
+
+In the same %ARTEMIS_INSTALL%\broker\etc\broker.xml file, add the following XML snippet anywhere under the `<core>` element:
+
+```
+<metrics>
+  <jvm-gc>true</jvm-gc>
+  <jvm-memory>true</jvm-memory>
+  <jvm-threads>true</jvm-threads>
+  <plugin class-name="com.redhat.amq.broker.core.server.metrics.plugins.ArtemisPrometheusMetricsPlugin"/>
+</metrics>
+```
 
 __Spoke03 Broker__
 
@@ -308,19 +313,24 @@ Copy the following files to the %ARTEMIS_INSTALL%\broker\etc directory:
 - artemis\tmp\spoke-03\keycloak-bearer-token.json
 - artemis\tmp\spoke-03\spoke-03-broker.properties
 
-Edit the %ARTEMIS_INSTALL%\broker\etc\broker.xml file. For each acceptor, add the following SSL parameters to the acceptor URL (use ";" for the parameter separator):
+Edit the %ARTEMIS_INSTALL%\broker\etc\broker.xml file. add the following XML snippet anywhere under the `<acceptors>` element:
 
-- `sslEnabled=true`
-- `keyStorePath=${artemis.instance}/etc/spoke-03-broker-keystore.jks`
-- `keyStorePassword=password`
-- `keyStoreType=PKCS12`
-- `keyStoreProvider=SUN`
-- `trustStorePath=${artemis.instance}/etc/spoke-03-broker-truststore.jks`
-- `trustStorePassword=password`
-- `trustStoreType=PKCS12`
-- `trustStoreProvider=SUN`
-- `wantClientAuth=false`
-- `needClientAuth=false`
+```
+<acceptor name="cores">tcp://0.0.0.0:61617?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=CORE;useEpoll=true;sslEnabled=true;keyStorePath=${artemis.instance}/etc/spoke-03-broker-keystore.jks;keyStorePassword=password;keyStoreType=PKCS12;keyStoreProvider=SUN;wantClientAuth=false;needClientAuth=false</acceptor>
+<acceptor name="amqps">tcp://0.0.0.0:5671?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=AMQP;useEpoll=true;amqpCredits=1000;amqpLowCredits=300;amqpMinLargeMessageSize=102400;amqpDuplicateDetection=true;sslEnabled=true;keyStorePath=${artemis.instance}/etc/spoke-03-broker-keystore.jks;keyStorePassword=password;keyStoreType=PKCS12;keyStoreProvider=SUN;wantClientAuth=false;needClientAuth=false</acceptor>
+<acceptor name="mqtts">tcp://0.0.0.0:8883?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=MQTT;useEpoll=true;sslEnabled=true;keyStorePath=${artemis.instance}/etc/spoke-03-broker-keystore.jks;keyStorePassword=password;keyStoreType=PKCS12;keyStoreProvider=SUN;wantClientAuth=false;needClientAuth=false</acceptor>
+```
+
+In the same %ARTEMIS_INSTALL%\broker\etc\broker.xml file, add the following XML snippet anywhere under the `<core>` element:
+
+```
+<metrics>
+  <jvm-gc>true</jvm-gc>
+  <jvm-memory>true</jvm-memory>
+  <jvm-threads>true</jvm-threads>
+  <plugin class-name="com.redhat.amq.broker.core.server.metrics.plugins.ArtemisPrometheusMetricsPlugin"/>
+</metrics>
+```
 
 ## Additional Helpful Commands
 

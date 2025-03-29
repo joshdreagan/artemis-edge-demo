@@ -7,11 +7,14 @@ Create the requisite namespaces.
 ```
 oc new-project keycloak
 oc new-project artemis
+oc new-project metrics
 ```
 
 Install the Keycloak operator into the 'keycloak' namespace.
 
 Install the AMQ Broker operator into the 'artemis' namespace.
+
+Install both the Prometheus and Grafana operators into the 'metrics' namespace.
 
 Set the environment variables.
 
@@ -170,6 +173,10 @@ oc -n artemis create secret generic hub-01-broker-bp --from-file=broker.properti
 #
 # Create the Artemis broker cluster.
 oc -n artemis apply -f "./artemis/hub-01-broker.yaml"
+
+#
+# Create the Prometheus metrics endpoint for the broker.
+oc -n artemis apply -f "./artemis/hub-01-prometheus-service.yaml"
 ```
 
 __Hub02 Broker__
@@ -330,6 +337,25 @@ In the same %ARTEMIS_INSTALL%\broker\etc\broker.xml file, add the following XML 
   <jvm-threads>true</jvm-threads>
   <plugin class-name="com.redhat.amq.broker.core.server.metrics.plugins.ArtemisPrometheusMetricsPlugin"/>
 </metrics>
+```
+
+## Prometheus/Grafana
+
+```
+#
+# Create/configure the Prometheus server. These steps must be completed as cluster-admin.
+oc -n metrics apply -f "./prometheus/prometheus-additional-scrape-secret.yaml"
+oc -n metrics apply -f "./prometheus/prometheus.yaml"
+oc -n metrics create secret generic hub-01-broker-auth --from-literal=user=admin --from-literal=password=admin
+oc -n metrics apply -f "./prometheus/hub-01-broker-service-monitor.yaml"
+# End cluster-admin steps.
+
+#
+# Create/configure the Grafana server.
+oc -n metrics apply -f "./grafana/grafana.yaml"
+oc -n metrics expose service grafana-service
+oc -n metrics apply -f "./grafana/hub-01-prometheus-datasource.yaml"
+oc -n metrics apply -f './grafana/grafana-*-dashboard.yaml'
 ```
 
 ## Additional Helpful Commands

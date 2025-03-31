@@ -170,7 +170,7 @@ oc -n metrics apply -f "./prometheus/spoke-01-broker-service-monitor.yaml"
 # Create/configure the Grafana server.
 oc -n metrics apply -f "./grafana/grafana.yaml"
 oc -n metrics expose service grafana-service
-oc -n metrics apply -f "./grafana/hub-01-prometheus-datasource.yaml"
+oc -n metrics apply -f "./grafana/prometheus-datasource.yaml"
 oc -n metrics apply -f './grafana/grafana-*-dashboard.yaml'
 ```
 

@@ -81,7 +81,7 @@ keytool -import -noprompt -alias "hub-02-broker" -keystore "./artemis/tls/spoke-
 
 #
 # Artemis Spoke02 broker
-CN=spoke-02-broker-*.${SPOKE01_DOMAIN}
+CN=spoke-02-broker-*.${SPOKE02_DOMAIN}
 SAN=
 SAN+=DNS:spoke-02-broker.${SPOKE02_DOMAIN},"
 keytool -genkeypair -alias broker -keyalg RSA -dname "CN=${CN}" -ext "SAN=${SAN}" -keystore "./artemis/tls/spoke-02-broker-keystore.jks" -storepass "password"
@@ -92,7 +92,7 @@ keytool -import -noprompt -alias "hub-02-broker" -keystore "./artemis/tls/spoke-
 
 #
 # Artemis Spoke03 broker
-CN=spoke-03-broker-*.${SPOKE01_DOMAIN}
+CN=spoke-03-broker-*.${SPOKE03_DOMAIN}
 SAN=
 SAN+=DNS:spoke-03-broker.${SPOKE03_DOMAIN},"
 keytool -genkeypair -alias broker -keyalg RSA -dname "CN=${CN}" -ext "SAN=${SAN}" -keystore "./artemis/tls/spoke-03-broker-keystore.jks" -storepass "password"

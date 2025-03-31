@@ -1,16 +1,16 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: hub-01-broker-service-monitor
+  name: spoke-01-broker-service-monitor
   labels:
-    ActiveMQArtemis: hub-01-broker
-    application: hub-01-broker-app
+    ActiveMQArtemis: spoke-01-broker
+    application: spoke-01-broker-app
     application-type: artemis
 spec:
   jobLabel: "ActiveMQArtemis"
   selector:
     matchLabels:
-      application: hub-01-broker-app
+      application: spoke-01-broker-app
       application-type: artemis
       service-type: prometheus
   namespaceSelector:
@@ -21,9 +21,9 @@ spec:
     scheme: http
     basicAuth:
       password:
-        name: hub-01-broker-auth
+        name: spoke-01-broker-auth
         key: password
       username:
-        name: hub-01-broker-auth
+        name: spoke-01-broker-auth
         key: user
     followRedirects: true

@@ -12,19 +12,19 @@ oc new-project metrics
 
 Install the Keycloak operator into the 'keycloak' namespace.
 
-Install the AMQ Broker operator into the 'artemis' namespace.
-
 Install both the Prometheus and Grafana operators into the 'metrics' namespace.
+
+Install the AMQ Broker operator into the 'artemis' namespace.
 
 Set the environment variables.
 
 ```
+export KC_DOMAIN="<insert_domain_here>"
 export HUB01_DOMAIN="<insert_domain_here>"
 export HUB02_DOMAIN="<insert_domain_here>"
 export SPOKE01_DOMAIN="<insert_domain_here>"
 export SPOKE02_DOMAIN="<insert_domain_here>"
 export SPOKE03_DOMAIN="<insert_domain_here>"
-export KC_DOMAIN="<insert_domain_here>"
 ```
 
 Generate the TLS certs and stores.
@@ -83,7 +83,7 @@ keytool -import -noprompt -alias "hub-02-broker" -keystore "./artemis/tls/spoke-
 # Artemis Spoke02 broker
 CN=spoke-02-broker-*.${SPOKE02_DOMAIN}
 SAN=
-SAN+=DNS:spoke-02-broker.${SPOKE02_DOMAIN},"
+SAN+="DNS:spoke-02-broker.${SPOKE02_DOMAIN},"
 keytool -genkeypair -alias broker -keyalg RSA -dname "CN=${CN}" -ext "SAN=${SAN}" -keystore "./artemis/tls/spoke-02-broker-keystore.jks" -storepass "password"
 keytool -export -alias "broker" -keystore "./artemis/tls/spoke-02-broker-keystore.jks" -storepass "password" -file "./artemis/tls/spoke-02-broker-certificate.crt"
 keytool -import -noprompt -alias "keycloak" -keystore "./artemis/tls/spoke-02-broker-truststore.jks" -storepass "password" -file "./keycloak/tls/certificate.pem"
@@ -94,7 +94,7 @@ keytool -import -noprompt -alias "hub-02-broker" -keystore "./artemis/tls/spoke-
 # Artemis Spoke03 broker
 CN=spoke-03-broker-*.${SPOKE03_DOMAIN}
 SAN=
-SAN+=DNS:spoke-03-broker.${SPOKE03_DOMAIN},"
+SAN+="DNS:spoke-03-broker.${SPOKE03_DOMAIN},"
 keytool -genkeypair -alias broker -keyalg RSA -dname "CN=${CN}" -ext "SAN=${SAN}" -keystore "./artemis/tls/spoke-03-broker-keystore.jks" -storepass "password"
 keytool -export -alias "broker" -keystore "./artemis/tls/spoke-03-broker-keystore.jks" -storepass "password" -file "./artemis/tls/spoke-03-broker-certificate.crt"
 keytool -import -noprompt -alias "keycloak" -keystore "./artemis/tls/spoke-03-broker-truststore.jks" -storepass "password" -file "./keycloak/tls/certificate.pem"
@@ -185,11 +185,14 @@ oc -n artemis create secret generic broker-tls-secret --from-file=broker.ks=./ar
 
 #
 # Create the OIDC JaaS configuration secret.
-export TRUSTSTORE_PATH=/etc/broker-tls-secret-volume/client.ts
+export DIRECT_KC_CONFIG='/amq/extra/secrets/oidc-jaas-config/_keycloak-direct-access.json'
+export BEARER_KC_CONFIG='/amq/extra/secrets/oidc-jaas-config/_keycloak-bearer-token.json'
+export TRUSTSTORE_PATH='/etc/broker-tls-secret-volume/client.ts'
+cat "./artemis/login.config" | envsubst > "./artemis/tmp/hub-01/login.config"
 cat "./artemis/keycloak-bearer-token.template.json" | envsubst > "./artemis/tmp/hub-01/keycloak-bearer-token.json"
 cat "./artemis/keycloak-direct-access.template.json" | envsubst > "./artemis/tmp/hub-01/keycloak-direct-access.json"
 cat "./artemis/keycloak-js-client.template.json" | envsubst > "./artemis/tmp/hub-01/keycloak-js-client.json"
-oc -n artemis create secret generic oidc-jaas-config --from-file=login.config=./artemis/login.config --from-file=_keycloak-js-client.json=./artemis/tmp/hub-01/keycloak-js-client.json --from-file=_keycloak-direct-access.json=./artemis/tmp/hub-01/keycloak-direct-access.json --from-file=_keycloak-bearker-token.json=./artemis/tmp/hub-01/keycloak-bearer-token.json
+oc -n artemis create secret generic oidc-jaas-config --from-file=login.config=./artemis/tmp/hub-01/login.config --from-file=_keycloak-js-client.json=./artemis/tmp/hub-01/keycloak-js-client.json --from-file=_keycloak-direct-access.json=./artemis/tmp/hub-01/keycloak-direct-access.json --from-file=_keycloak-bearker-token.json=./artemis/tmp/hub-01/keycloak-bearer-token.json
 
 #
 # Create the brokerProperties secret.
@@ -214,11 +217,14 @@ oc -n artemis create secret generic broker-tls-secret --from-file=broker.ks=./ar
 
 #
 # Create the OIDC JaaS configuration secret.
-export TRUSTSTORE_PATH=/etc/broker-tls-secret-volume/client.ts
+export DIRECT_KC_CONFIG='/amq/extra/secrets/oidc-jaas-config/_keycloak-direct-access.json'
+export BEARER_KC_CONFIG='/amq/extra/secrets/oidc-jaas-config/_keycloak-bearer-token.json'
+export TRUSTSTORE_PATH='/etc/broker-tls-secret-volume/client.ts'
+cat "./artemis/login.config" | envsubst > "./artemis/tmp/hub-02/login.config"
 cat "./artemis/keycloak-bearer-token.template.json" | envsubst > "./artemis/tmp/hub-02/keycloak-bearer-token.json"
 cat "./artemis/keycloak-direct-access.template.json" | envsubst > "./artemis/tmp/hub-02/keycloak-direct-access.json"
 cat "./artemis/keycloak-js-client.template.json" | envsubst > "./artemis/tmp/hub-02/keycloak-js-client.json"
-oc -n artemis create secret generic oidc-jaas-config --from-file=login.config=./artemis/login.config --from-file=_keycloak-js-client.json=./artemis/tmp/hub-02/keycloak-js-client.json --from-file=_keycloak-direct-access.json=./artemis/tmp/hub-02/keycloak-direct-access.json --from-file=_keycloak-bearker-token.json=./artemis/tmp/hub-02/keycloak-bearer-token.json
+oc -n artemis create secret generic oidc-jaas-config --from-file=login.config=./artemis/tmp/hub-02/login.config --from-file=_keycloak-js-client.json=./artemis/tmp/hub-02/keycloak-js-client.json --from-file=_keycloak-direct-access.json=./artemis/tmp/hub-02/keycloak-direct-access.json --from-file=_keycloak-bearker-token.json=./artemis/tmp/hub-02/keycloak-bearer-token.json
 
 #
 # Create the brokerProperties secret.
@@ -228,6 +234,10 @@ oc -n artemis create secret generic hub-02-broker-bp --from-file=broker.properti
 #
 # Create the Artemis broker cluster.
 oc -n artemis apply -f "./artemis/hub-02-broker.yaml"
+
+#
+# Create the Prometheus metrics endpoint for the broker.
+oc -n artemis apply -f "./artemis/hub-02-prometheus-service.yaml"
 ```
 
 __Spoke01 Broker__
@@ -239,11 +249,14 @@ oc -n artemis create secret generic broker-tls-secret --from-file=broker.ks=./ar
 
 #
 # Create the OIDC JaaS configuration secret.
-export TRUSTSTORE_PATH=/etc/broker-tls-secret-volume/client.ts
+export DIRECT_KC_CONFIG='/amq/extra/secrets/oidc-jaas-config/_keycloak-direct-access.json'
+export BEARER_KC_CONFIG='/amq/extra/secrets/oidc-jaas-config/_keycloak-bearer-token.json'
+export TRUSTSTORE_PATH='/etc/broker-tls-secret-volume/client.ts'
+cat "./artemis/login.config" | envsubst > "./artemis/tmp/spoke-01/login.config"
 cat "./artemis/keycloak-bearer-token.template.json" | envsubst > "./artemis/tmp/spoke-01/keycloak-bearer-token.json"
 cat "./artemis/keycloak-direct-access.template.json" | envsubst > "./artemis/tmp/spoke-01/keycloak-direct-access.json"
 cat "./artemis/keycloak-js-client.template.json" | envsubst > "./artemis/tmp/spoke-01/keycloak-js-client.json"
-oc -n artemis create secret generic oidc-jaas-config --from-file=login.config=./artemis/login.config --from-file=_keycloak-js-client.json=./artemis/tmp/spoke-01/keycloak-js-client.json --from-file=_keycloak-direct-access.json=./artemis/tmp/spoke-01/keycloak-direct-access.json --from-file=_keycloak-bearker-token.json=./artemis/tmp/spoke-01/keycloak-bearer-token.json
+oc -n artemis create secret generic oidc-jaas-config --from-file=login.config=./artemis/tmp/spoke-01/login.config --from-file=_keycloak-js-client.json=./artemis/tmp/spoke-01/keycloak-js-client.json --from-file=_keycloak-direct-access.json=./artemis/tmp/spoke-01/keycloak-direct-access.json --from-file=_keycloak-bearker-token.json=./artemis/tmp/spoke-01/keycloak-bearer-token.json
 
 #
 # Create the brokerProperties secret.
@@ -253,6 +266,10 @@ oc -n artemis create secret generic spoke-01-broker-bp --from-file=broker.proper
 #
 # Create the Artemis broker cluster.
 oc -n artemis apply -f "./artemis/spoke-01-broker.yaml"
+
+#
+# Create the Prometheus metrics endpoint for the broker.
+oc -n artemis apply -f "./artemis/spoke-01-prometheus-service.yaml"
 ```
 
 __Spoke02 Broker__
@@ -260,8 +277,11 @@ __Spoke02 Broker__
 Prepare the installation files. __Do this on a Linux machine so the commands work, or manually make the edits to the files on a Windows machine.__
 
 ```
-export TRUSTSTORE_PATH='${artemis.instance}/broker/etc/spoke-02-broker-truststore.jks'
+export DIRECT_KC_CONFIG='${artemis.instance}/etc/keycloak-direct-access.json'
+export BEARER_KC_CONFIG='${artemis.instance}/etc/keycloak-bearer-token.json'
+export TRUSTSTORE_PATH='${artemis.instance}/etc/spoke-02-broker-truststore.jks'
 
+cat "./artemis/login.config" | envsubst > "./artemis/tmp/spoke-02/login.config"
 cat "./artemis/keycloak-bearer-token.template.json" | envsubst > "./artemis/tmp/spoke-02/keycloak-bearer-token.json"
 cat "./artemis/keycloak-direct-access.template.json" | envsubst > "./artemis/tmp/spoke-02/keycloak-direct-access.json"
 cat "./artemis/keycloak-js-client.template.json" | envsubst > "./artemis/tmp/spoke-02/keycloak-js-client.json"
@@ -285,7 +305,7 @@ Copy the following files to the %ARTEMIS_INSTALL%\broker\etc directory:
 
 - artemis\tls\spoke-02-broker-keystore.jks
 - artemis\tls\spoke-02-broker-truststore.jks
-- artemis\login.config
+- artemis\tmp\spoke-02\login.config
 - artemis\tmp\spoke-02\keycloak-js-client.json
 - artemis\tmp\spoke-02\keycloak-direct-access.json
 - artemis\tmp\spoke-02\keycloak-bearer-token.json
@@ -294,9 +314,9 @@ Copy the following files to the %ARTEMIS_INSTALL%\broker\etc directory:
 Edit the %ARTEMIS_INSTALL%\broker\etc\broker.xml file. add the following XML snippet anywhere under the `<acceptors>` element:
 
 ```
-<acceptor name="cores">tcp://0.0.0.0:61617?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=CORE;useEpoll=true;sslEnabled=true;keyStorePath=${artemis.instance}/etc/spoke-02-broker-keystore.jks;keyStorePassword=password;keyStoreType=PKCS12;keyStoreProvider=SUN;wantClientAuth=false;needClientAuth=false</acceptor>
-<acceptor name="amqps">tcp://0.0.0.0:5671?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=AMQP;useEpoll=true;amqpCredits=1000;amqpLowCredits=300;amqpMinLargeMessageSize=102400;amqpDuplicateDetection=true;sslEnabled=true;keyStorePath=${artemis.instance}/etc/spoke-02-broker-keystore.jks;keyStorePassword=password;keyStoreType=PKCS12;keyStoreProvider=SUN;wantClientAuth=false;needClientAuth=false</acceptor>
-<acceptor name="mqtts">tcp://0.0.0.0:8883?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=MQTT;useEpoll=true;sslEnabled=true;keyStorePath=${artemis.instance}/etc/spoke-02-broker-keystore.jks;keyStorePassword=password;keyStoreType=PKCS12;keyStoreProvider=SUN;wantClientAuth=false;needClientAuth=false</acceptor>
+<acceptor name="cores">tcp://0.0.0.0:61617?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=CORE;useEpoll=true;sslEnabled=true;keyStorePath=${artemis.instance}/etc/spoke-02-broker-keystore.jks;keyStorePassword=password;keyStoreType=PKCS12;keyStoreProvider=SUN;wantClientAuth=false;needClientAuth=false;sslAutoReload=true</acceptor>
+<acceptor name="amqps">tcp://0.0.0.0:5671?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=AMQP;useEpoll=true;amqpCredits=1000;amqpLowCredits=300;amqpMinLargeMessageSize=102400;amqpDuplicateDetection=true;sslEnabled=true;keyStorePath=${artemis.instance}/etc/spoke-02-broker-keystore.jks;keyStorePassword=password;keyStoreType=PKCS12;keyStoreProvider=SUN;wantClientAuth=false;needClientAuth=false;sslAutoReload=true</acceptor>
+<acceptor name="mqtts">tcp://0.0.0.0:8883?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=MQTT;useEpoll=true;sslEnabled=true;keyStorePath=${artemis.instance}/etc/spoke-02-broker-keystore.jks;keyStorePassword=password;keyStoreType=PKCS12;keyStoreProvider=SUN;wantClientAuth=false;needClientAuth=false;sslAutoReload=true</acceptor>
 ```
 
 In the same %ARTEMIS_INSTALL%\broker\etc\broker.xml file, add the following XML snippet anywhere under the `<core>` element:
@@ -315,8 +335,11 @@ __Spoke03 Broker__
 Prepare the installation files. __Do this on a Linux machine so the commands work, or manually make the edits to the files on a Windows machine.__
 
 ```
-export TRUSTSTORE_PATH='${artemis.instance}/broker/etc/spoke-03-broker-truststore.jks'
+export DIRECT_KC_CONFIG='${artemis.instance}/etc/keycloak-direct-access.json'
+export BEARER_KC_CONFIG='${artemis.instance}/etc/keycloak-bearer-token.json'
+export TRUSTSTORE_PATH='${artemis.instance}/etc/spoke-03-broker-truststore.jks'
 
+cat "./artemis/login.config" | envsubst > "./artemis/tmp/spoke-03/login.config"
 cat "./artemis/keycloak-bearer-token.template.json" | envsubst > "./artemis/tmp/spoke-03/keycloak-bearer-token.json"
 cat "./artemis/keycloak-direct-access.template.json" | envsubst > "./artemis/tmp/spoke-03/keycloak-direct-access.json"
 cat "./artemis/keycloak-js-client.template.json" | envsubst > "./artemis/tmp/spoke-03/keycloak-js-client.json"
@@ -340,7 +363,7 @@ Copy the following files to the %ARTEMIS_INSTALL%\broker\etc directory:
 
 - artemis\tls\spoke-03-broker-keystore.jks
 - artemis\tls\spoke-03-broker-truststore.jks
-- artemis\login.config
+- artemis\tmp\spoke-03\login.config
 - artemis\tmp\spoke-03\keycloak-js-client.json
 - artemis\tmp\spoke-03\keycloak-direct-access.json
 - artemis\tmp\spoke-03\keycloak-bearer-token.json
@@ -349,9 +372,9 @@ Copy the following files to the %ARTEMIS_INSTALL%\broker\etc directory:
 Edit the %ARTEMIS_INSTALL%\broker\etc\broker.xml file. add the following XML snippet anywhere under the `<acceptors>` element:
 
 ```
-<acceptor name="cores">tcp://0.0.0.0:61617?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=CORE;useEpoll=true;sslEnabled=true;keyStorePath=${artemis.instance}/etc/spoke-03-broker-keystore.jks;keyStorePassword=password;keyStoreType=PKCS12;keyStoreProvider=SUN;wantClientAuth=false;needClientAuth=false</acceptor>
-<acceptor name="amqps">tcp://0.0.0.0:5671?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=AMQP;useEpoll=true;amqpCredits=1000;amqpLowCredits=300;amqpMinLargeMessageSize=102400;amqpDuplicateDetection=true;sslEnabled=true;keyStorePath=${artemis.instance}/etc/spoke-03-broker-keystore.jks;keyStorePassword=password;keyStoreType=PKCS12;keyStoreProvider=SUN;wantClientAuth=false;needClientAuth=false</acceptor>
-<acceptor name="mqtts">tcp://0.0.0.0:8883?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=MQTT;useEpoll=true;sslEnabled=true;keyStorePath=${artemis.instance}/etc/spoke-03-broker-keystore.jks;keyStorePassword=password;keyStoreType=PKCS12;keyStoreProvider=SUN;wantClientAuth=false;needClientAuth=false</acceptor>
+<acceptor name="cores">tcp://0.0.0.0:61617?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=CORE;useEpoll=true;sslEnabled=true;keyStorePath=${artemis.instance}/etc/spoke-03-broker-keystore.jks;keyStorePassword=password;keyStoreType=PKCS12;keyStoreProvider=SUN;wantClientAuth=false;needClientAuth=false;sslAutoReload=true</acceptor>
+<acceptor name="amqps">tcp://0.0.0.0:5671?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=AMQP;useEpoll=true;amqpCredits=1000;amqpLowCredits=300;amqpMinLargeMessageSize=102400;amqpDuplicateDetection=true;sslEnabled=true;keyStorePath=${artemis.instance}/etc/spoke-03-broker-keystore.jks;keyStorePassword=password;keyStoreType=PKCS12;keyStoreProvider=SUN;wantClientAuth=false;needClientAuth=false;sslAutoReload=true</acceptor>
+<acceptor name="mqtts">tcp://0.0.0.0:8883?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=MQTT;useEpoll=true;sslEnabled=true;keyStorePath=${artemis.instance}/etc/spoke-03-broker-keystore.jks;keyStorePassword=password;keyStoreType=PKCS12;keyStoreProvider=SUN;wantClientAuth=false;needClientAuth=false;sslAutoReload=true</acceptor>
 ```
 
 In the same %ARTEMIS_INSTALL%\broker\etc\broker.xml file, add the following XML snippet anywhere under the `<core>` element:

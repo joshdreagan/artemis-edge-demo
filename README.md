@@ -311,7 +311,13 @@ Copy the following files to the %ARTEMIS_INSTALL%\broker\etc directory:
 - artemis\tmp\spoke-02\keycloak-bearer-token.json
 - artemis\tmp\spoke-02\spoke-02-broker.properties
 
-Edit the %ARTEMIS_INSTALL%\broker\etc\broker.xml file. add the following XML snippet anywhere under the `<acceptors>` element:
+Edit the %ARTEMIS_INSTALL%\broker\etc\broker.xml file. Set the value of the `<persistence-enabled>` tag to "false" as shown below.
+
+```
+<persistence-enabled>false</persistence-enabled>
+```
+
+In the same %ARTEMIS_INSTALL%\broker\etc\broker.xml file, add the following XML snippet anywhere under the `<acceptors>` element:
 
 ```
 <acceptor name="cores">tcp://0.0.0.0:61617?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=CORE;useEpoll=true;sslEnabled=true;keyStorePath=${artemis.instance}/etc/spoke-02-broker-keystore.jks;keyStorePassword=password;keyStoreType=PKCS12;keyStoreProvider=SUN;wantClientAuth=false;needClientAuth=false;sslAutoReload=true</acceptor>
@@ -369,7 +375,13 @@ Copy the following files to the %ARTEMIS_INSTALL%\broker\etc directory:
 - artemis\tmp\spoke-03\keycloak-bearer-token.json
 - artemis\tmp\spoke-03\spoke-03-broker.properties
 
-Edit the %ARTEMIS_INSTALL%\broker\etc\broker.xml file. add the following XML snippet anywhere under the `<acceptors>` element:
+Edit the %ARTEMIS_INSTALL%\broker\etc\broker.xml file. Set the value of the `<persistence-enabled>` tag to "false" as shown below.
+
+```
+<persistence-enabled>false</persistence-enabled>
+```
+
+In the same %ARTEMIS_INSTALL%\broker\etc\broker.xml file, add the following XML snippet anywhere under the `<acceptors>` element:
 
 ```
 <acceptor name="cores">tcp://0.0.0.0:61617?tcpSendBufferSize=1048576;tcpReceiveBufferSize=1048576;protocols=CORE;useEpoll=true;sslEnabled=true;keyStorePath=${artemis.instance}/etc/spoke-03-broker-keystore.jks;keyStorePassword=password;keyStoreType=PKCS12;keyStoreProvider=SUN;wantClientAuth=false;needClientAuth=false;sslAutoReload=true</acceptor>

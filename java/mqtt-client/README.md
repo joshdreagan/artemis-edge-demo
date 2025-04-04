@@ -1,58 +1,57 @@
-# mqtt-client
+# MQTT Client
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+## Running
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+To run in dev mode:
 
-## Running the application in dev mode
-
-You can run your application in dev mode that enables live coding using:
-
-```shell script
-./mvnw quarkus:dev
+```
+mvn quarkus:dev \
+  -Dmode=producer \
+  '-Daddress=messages/CT/5607' \
+  -Dmqtt.client-id=mqtt-client-producer \
+  '-Dmqtt.broker-url=tcp://localhost:1883' \
+  -Dmqtt.user-name=alice \
+  -Dmqtt.password=bosco
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+To bundle and run as a standalone app:
 
-## Packaging and running the application
-
-The application can be packaged using:
-
-```shell script
-./mvnw package
+```
+mvn package -Dquarkus.package.jar.type=uber-jar
+java \
+  -Dmode=producer \
+  '-Daddress=messages/CT/5607' \
+  -Dmqtt.client-id=mqtt-client-producer \
+  '-Dmqtt.broker-url=tcp://localhost:1883' \
+  -Dmqtt.user-name=alice \
+  -Dmqtt.password=bosco \
+  -jar target/mqtt-client-1.0.0-SNAPSHOT-runner.jar
 ```
 
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
+Here's an SSL example:
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
-
-If you want to build an _über-jar_, execute the following command:
-
-```shell script
-./mvnw package -Dquarkus.package.jar.type=uber-jar
+```
+java \
+  -Dmode=producer \
+  '-Daddress=messages/CT/5607' \
+  -Dmqtt.client-id=mqtt-client-producer \
+  -Dmqtt.broker-url=ssl://hub-01-broker-mqtts-acceptor-0-svc-rte-hub-01.apps.cluster-5qtbx.5qtbx.sandbox1380.opentlc.com:443 \
+  -Dmqtt.user-name=alice \
+  -Dmqtt.password=bosco \
+  -Dmqtt.ssl-client-props."com.ibm.ssl.trustStore"=$PROJECT_ROOT/artemis/tls/client-truststore.jks \
+  -Dmqtt.ssl-client-props."com.ibm.ssl.trustStorePassword"=password \
+  -Dmqtt.ssl-client-props."com.ibm.ssl.trustStoreType"=PKCS12  \
+  -jar target/mqtt-client-1.0.0-SNAPSHOT-runner.jar
 ```
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
+## Application Configuration
 
-## Creating a native executable
+| Property  | Default | Description                                                                                                                                                                                                                                                                                                                          |
+|:----------|:--------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mode`    |         | The mode for the client. Valid values are "consumer", or "producer".                                                                                                                                                                                                                                                                 |
+| `address` |         | The address for the MQTT producer or consumer. For consumers, this can contain wildcards.                                                                                                                                                                                                                                            |
+| `mqtt.*`  |         | The properties for the MQTT client connection. These can include any valid configurations from the Paho MQTT5 Camel Component linked below, prefixed with "mqtt.", and using the Quarkus property naming convention. For instance, to set the `clientId` component configuration, you would use the property named `mqtt.client-id`. |
 
-You can create a native executable using:
+## Paho MQTT5 Component Configuration
 
-```shell script
-./mvnw package -Dnative
-```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
-
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
-```
-
-You can then execute your native executable with: `./target/mqtt-client-1.0.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
-
-## Related Guides
-
-- Camel Paho MQTT5 ([guide](https://docs.redhat.com/en/documentation/red_hat_build_of_apache_camel/4.8/html-single/red_hat_build_of_apache_camel_for_quarkus_reference/camel-quarkus-extensions-reference#extensions-paho-mqtt5)): Communicate with MQTT message brokers using Eclipse Paho MQTT v5 Client
+https://camel.apache.org/components/4.10.x/paho-mqtt5-component.html

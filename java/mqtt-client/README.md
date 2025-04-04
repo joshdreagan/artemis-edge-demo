@@ -31,6 +31,7 @@ java \
 Here's an SSL example:
 
 ```
+mvn package -Dquarkus.package.jar.type=uber-jar
 java \
   -Dmode=producer \
   '-Daddress=messages/CT/5607' \

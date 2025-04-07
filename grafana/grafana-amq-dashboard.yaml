@@ -33,8 +33,7 @@ spec:
       "panels": [
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "3f2eb4f1-1493-4451-8730-e5de165eed4b"
+            "type": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -117,8 +116,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "type": "prometheus",
-                "uid": "3f2eb4f1-1493-4451-8730-e5de165eed4b"
+                "type": "prometheus"
               },
               "expr": "artemis_message_count ",
               "legendFormat": "Total ({{broker}} - {{address}}::{{queue}})",
@@ -126,8 +124,7 @@ spec:
             },
             {
               "datasource": {
-                "type": "prometheus",
-                "uid": "3f2eb4f1-1493-4451-8730-e5de165eed4b"
+                "type": "prometheus"
               },
               "expr": "artemis_delivering_message_count ",
               "legendFormat": "Delivering ({{broker}} - {{address}}::{{queue}})",
@@ -135,8 +132,7 @@ spec:
             },
             {
               "datasource": {
-                "type": "prometheus",
-                "uid": "3f2eb4f1-1493-4451-8730-e5de165eed4b"
+                "type": "prometheus"
               },
               "expr": "artemis_scheduled_message_count ",
               "legendFormat": "Scheduled ({{broker}} - {{address}}::{{queue}})",
@@ -148,8 +144,7 @@ spec:
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "3f2eb4f1-1493-4451-8730-e5de165eed4b"
+            "type": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -232,8 +227,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "type": "prometheus",
-                "uid": "3f2eb4f1-1493-4451-8730-e5de165eed4b"
+                "type": "prometheus"
               },
               "expr": "artemis_messages_acknowledged",
               "legendFormat": "Acked ({{broker}} - {{address}}::{{queue}})",
@@ -241,8 +235,7 @@ spec:
             },
             {
               "datasource": {
-                "type": "prometheus",
-                "uid": "3f2eb4f1-1493-4451-8730-e5de165eed4b"
+                "type": "prometheus"
               },
               "expr": "artemis_messages_added",
               "legendFormat": "Added ({{broker}} - {{address}}::{{queue}})",
@@ -254,8 +247,7 @@ spec:
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "3f2eb4f1-1493-4451-8730-e5de165eed4b"
+            "type": "prometheus"
           },
           "description": "Number of clients currently connected to this server.",
           "fieldConfig": {
@@ -339,8 +331,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "type": "prometheus",
-                "uid": "3f2eb4f1-1493-4451-8730-e5de165eed4b"
+                "type": "prometheus"
               },
               "expr": "artemis_connection_count",
               "legendFormat": "{{broker}}",
@@ -352,8 +343,7 @@ spec:
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "3f2eb4f1-1493-4451-8730-e5de165eed4b"
+            "type": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -436,8 +426,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "type": "prometheus",
-                "uid": "3f2eb4f1-1493-4451-8730-e5de165eed4b"
+                "type": "prometheus"
               },
               "expr": "artemis_delivering_persistent_size",
               "legendFormat": "Delivering ({{broker}} - {{address}}::{{queue}})",
@@ -445,8 +434,7 @@ spec:
             },
             {
               "datasource": {
-                "type": "prometheus",
-                "uid": "3f2eb4f1-1493-4451-8730-e5de165eed4b"
+                "type": "prometheus"
               },
               "expr": "artemis_persistent_size",
               "legendFormat": "Total ({{broker}} - {{address}}::{{queue}})",
@@ -454,8 +442,7 @@ spec:
             },
             {
               "datasource": {
-                "type": "prometheus",
-                "uid": "3f2eb4f1-1493-4451-8730-e5de165eed4b"
+                "type": "prometheus"
               },
               "expr": "artemis_scheduled_persistent_size",
               "legendFormat": "Scheduled ({{broker}} - {{address}}::{{queue}})",
@@ -467,8 +454,7 @@ spec:
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "3f2eb4f1-1493-4451-8730-e5de165eed4b"
+            "type": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -551,8 +537,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "type": "prometheus",
-                "uid": "3f2eb4f1-1493-4451-8730-e5de165eed4b"
+                "type": "prometheus"
               },
               "expr": "artemis_unrouted_message_count",
               "legendFormat": "Unrouted ({{broker}} - {{address}})",
@@ -560,8 +545,7 @@ spec:
             },
             {
               "datasource": {
-                "type": "prometheus",
-                "uid": "3f2eb4f1-1493-4451-8730-e5de165eed4b"
+                "type": "prometheus"
               },
               "expr": "artemis_routed_message_count",
               "legendFormat": "Routed ({{broker}} - {{address}})",
@@ -573,8 +557,7 @@ spec:
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "3f2eb4f1-1493-4451-8730-e5de165eed4b"
+            "type": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -657,8 +640,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "type": "prometheus",
-                "uid": "3f2eb4f1-1493-4451-8730-e5de165eed4b"
+                "type": "prometheus"
               },
               "expr": "artemis_address_memory_usage",
               "legendFormat": "{{broker}}",
@@ -670,8 +652,7 @@ spec:
         },
         {
           "datasource": {
-            "type": "prometheus",
-            "uid": "3f2eb4f1-1493-4451-8730-e5de165eed4b"
+            "type": "prometheus"
           },
           "fieldConfig": {
             "defaults": {
@@ -754,8 +735,7 @@ spec:
           "targets": [
             {
               "datasource": {
-                "type": "prometheus",
-                "uid": "3f2eb4f1-1493-4451-8730-e5de165eed4b"
+                "type": "prometheus"
               },
               "expr": "artemis_consumer_count",
               "legendFormat": "{{broker}} - {{address}}::{{queue}}",

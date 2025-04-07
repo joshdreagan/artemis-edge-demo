@@ -270,6 +270,7 @@ oc -n artemis apply -f "./artemis/spoke-01-broker.yaml"
 #
 # Create the Prometheus metrics endpoint for the broker.
 oc -n artemis apply -f "./artemis/spoke-01-prometheus-service.yaml"
+oc -n artemis expose service spoke-01-broker-prometheus-0-svc
 ```
 
 __Spoke02 Broker__

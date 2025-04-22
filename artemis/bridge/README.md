@@ -28,7 +28,7 @@ Copy the "%PROJECT_ROOT%\artemis\tls\spoke-01-broker-truststore.jks" to the "%AR
 
 Copy the "%PROJECT_ROOT%\java\artemis-extensions\target\artemis-extensions-1.0.0-SNAPSHOT.jar" to the "%ARTEMIS_INSTALL%\broker\lib" directory.
 
-Edit the "%ARTEMIS_INSTALL%\broker\etc\broker.xml" file and add the following XML anywhere under the `<core>` tag:
+Edit the "%ARTEMIS_INSTALL%\broker\etc\broker.xml" file and add the following XML anywhere under the `<core>` element:
 
 ```
 <broker-plugins>
@@ -84,7 +84,7 @@ Copy the "%PROJECT_ROOT%/artemis/tls/spoke-02-broker-truststore.jks" to the "%AR
 
 Copy the "%PROJECT_ROOT%\java\artemis-extensions\target\artemis-extensions-1.0.0-SNAPSHOT.jar" to the "%ARTEMIS_INSTALL%\broker\lib" directory.
 
-Edit the "%ARTEMIS_INSTALL%\broker\etc\broker.xml" file and add the following XML anywhere under the `<core>` tag:
+Edit the "%ARTEMIS_INSTALL%\broker\etc\broker.xml" file and add the following XML anywhere under the `<core>` element:
 
 ```
 <broker-plugins>
@@ -140,7 +140,7 @@ Copy the "%PROJECT_ROOT%/artemis/tls/spoke-03-broker-truststore.jks" to the "%AR
 
 Copy the "%PROJECT_ROOT%\java\artemis-extensions\target\artemis-extensions-1.0.0-SNAPSHOT.jar" to the "%ARTEMIS_INSTALL%\broker\lib" directory.
 
-Edit the "%ARTEMIS_INSTALL%\broker\etc\broker.xml" file and add the following XML anywhere under the `<core>` tag:
+Edit the "%ARTEMIS_INSTALL%\broker\etc\broker.xml" file and add the following XML anywhere under the `<core>` element:
 
 ```
 <broker-plugins>

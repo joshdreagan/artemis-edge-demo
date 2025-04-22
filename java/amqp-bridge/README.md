@@ -9,11 +9,11 @@ To run in dev mode:
 ```aiignore
 export PROJECT_ROOT="<root_of_git_repo>"
 mvn quarkus:dev \
-  '-Dsource.address=messages.CT.#' \
-  -Dsource.pedigree=spoke-02 \
-  "-Dsource.uri=amqps://localhost:5671?jms.clientID=spoke-02-sender&jms.username=admin&jms.password=admin&transport.trustStoreLocation=$PROJECT_ROOT/artemis/tls/client-truststore.jks&transport.trustStorePassword=password&transport.trustStoreType=PKCS12" \
+  '-Dsource.address=messages.NY.#' \
+  -Dsource.pedigree=spoke-01 \
+  "-Dsource.uri=amqp://localhost:5672?jms.clientID=spoke-01-ny-sender&jms.username=admin&jms.password=admin" \
   -Dtarget.pedigree=hub-01 \
-  "-Dtarget.uri=amqp://localhost:5674?jms.clientID=spoke-02-sender&jms.username=admin&jms.password=admin"
+  "-Dtarget.uri=amqps://hub-01-broker-amqps-acceptor-0-svc-rte-artemis.${HUB01_DOMAIN}:443?jms.clientID=spoke-01-ny-sender&jms.username=admin&jms.password=admin&transport.trustStoreLocation=$PROJECT_ROOT/artemis/tls/client-truststore.jks&transport.trustStorePassword=password&transport.trustStoreType=PKCS12"
 ```
 
 To bundle and run as a standalone app:
@@ -21,11 +21,11 @@ To bundle and run as a standalone app:
 ```
 mvn package -Dquarkus.package.jar.type=uber-jar
 java \
-  '-Dsource.address=messages.CT.#' \
-  -Dsource.pedigree=spoke-02 \
-  "-Dsource.uri=amqps://localhost:5671?jms.clientID=spoke-02-sender&jms.username=admin&jms.password=admin&transport.trustStoreLocation=$PROJECT_ROOT/artemis/tls/client-truststore.jks&transport.trustStorePassword=password&transport.trustStoreType=PKCS12" \
+  '-Dsource.address=messages.NY.#' \
+  -Dsource.pedigree=spoke-01 \
+  "-Dsource.uri=amqp://localhost:5672?jms.clientID=spoke-01-ny-sender&jms.username=admin&jms.password=admin" \
   -Dtarget.pedigree=hub-01 \
-  "-Dtarget.uri=amqp://localhost:5674?jms.clientID=spoke-02-sender&jms.username=admin&jms.password=admin" \
+  "-Dtarget.uri=amqps://hub-01-broker-amqps-acceptor-0-svc-rte-artemis.${HUB01_DOMAIN}:443?jms.clientID=spoke-01-ny-sender&jms.username=admin&jms.password=admin&transport.trustStoreLocation=$PROJECT_ROOT/artemis/tls/client-truststore.jks&transport.trustStorePassword=password&transport.trustStoreType=PKCS12" \
   -jar target/amqp-bridge-1.0.0-SNAPSHOT-runner.jar
 ```
 

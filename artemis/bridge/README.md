@@ -12,12 +12,20 @@ set SPOKE02_DOMAIN="<insert_domain_here>"
 set SPOKE03_DOMAIN="<insert_domain_here>"
 ```
 
-Build the bridge project
+Build the amqp-bridge project
 
 ```
 set PROJECT_ROOT="%CD%" # This should be the root of the git repo.
 cd "%PROJECT_ROO%\java\amqp-bridge"
 mvn clean package -Dquarkus.package.jar.type=uber-jar
+```
+
+Build the artemis-extensions project
+
+```
+set PROJECT_ROOT="%CD%" # This should be the root of the git repo.
+cd "%PROJECT_ROO%\java\artemis-extensions"
+mvn clean package
 ```
 
 ## Spoke 01 Bridges

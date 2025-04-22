@@ -12,7 +12,7 @@ mvn quarkus:dev \
   '-Dsource.address=messages.CT.#' \
   -Dsource.pedigree=spoke-02 \
   "-Dsource.uri=amqps://localhost:5671?jms.clientID=spoke-02-sender&jms.username=admin&jms.password=admin&transport.trustStoreLocation=$PROJECT_ROOT/artemis/tls/client-truststore.jks&transport.trustStorePassword=password&transport.trustStoreType=PKCS12" \
-  -Dtarget.pedigree=spoke-03 \
+  -Dtarget.pedigree=hub-01 \
   "-Dtarget.uri=amqp://localhost:5674?jms.clientID=spoke-02-sender&jms.username=admin&jms.password=admin"
 ```
 
@@ -24,7 +24,7 @@ java \
   '-Dsource.address=messages.CT.#' \
   -Dsource.pedigree=spoke-02 \
   "-Dsource.uri=amqps://localhost:5671?jms.clientID=spoke-02-sender&jms.username=admin&jms.password=admin&transport.trustStoreLocation=$PROJECT_ROOT/artemis/tls/client-truststore.jks&transport.trustStorePassword=password&transport.trustStoreType=PKCS12" \
-  -Dtarget.pedigree=spoke-03 \
+  -Dtarget.pedigree=hub-01 \
   "-Dtarget.uri=amqp://localhost:5674?jms.clientID=spoke-02-sender&jms.username=admin&jms.password=admin" \
   -jar target/amqp-bridge-1.0.0-SNAPSHOT-runner.jar
 ```

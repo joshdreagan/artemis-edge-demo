@@ -1,5 +1,7 @@
 # Artemis Edge Demo
 
+![Messaging Use Cases](./img/message_use_cases.png)
+
 ## Setup
 
 Create the requisite namespaces.

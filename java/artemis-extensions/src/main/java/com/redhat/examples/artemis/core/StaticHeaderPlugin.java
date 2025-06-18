@@ -33,7 +33,7 @@ public class StaticHeaderPlugin implements ActiveMQServerPlugin {
   @Override
   public void beforeSend(ServerSession session, Transaction tx, Message message, boolean direct, boolean noAutoCreateQueue) throws ActiveMQException {
     if (!message.containsProperty(headerName) || overwrite) {
-      log.info("Adding header: [" + headerName + "=" + headerValue + "]");
+      log.info("Adding header: [{}={}]", headerName, headerValue);
       message.putStringProperty(headerName, headerValue);
       message.reencode();
     }
